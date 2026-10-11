@@ -1,0 +1,42 @@
+name: Build MobileDumper-7 iOS Dylib
+
+on:
+  workflow_dispatch: # Allows you to run this manually from the Actions tab
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build-ios:
+    # This is the key line: it requests a free macOS runner.
+    runs-on: macos-15
+    
+    steps:
+      - name: Checkout repository with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive # Critical: MobileDumper-7 needs KittyMemory, etc.
+
+      - name: Select Xcode version
+        # The macos-15 runner comes with Xcode pre-installed. 
+        # We just need to make sure the command-line tools point to it.
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build iOS Dylib
+        # This is the exact command from the MobileDumper-7 README
+        run: ./build.sh --platform ios --target dylib --build release
+
+      - name: Find and Upload the Dylib
+        # The script might output to different folders depending on the version.
+        # This step finds the .dylib file and uploads it as an artifact.
+        run: |
+          find . -name "*.dylib" -type f -print
+          mkdir -p output
+          find . -name "*.dylib" -type f -exec cp {} output/ \;
+        shell: bash
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MobileDumper-7-iOS-Dylib
+          path: output/
+          if-no-files-found: error
