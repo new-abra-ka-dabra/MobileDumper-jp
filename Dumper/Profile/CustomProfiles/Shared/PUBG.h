@@ -12,7 +12,7 @@ public:
 		return {
 		    "com.tencent.ig",
 		    "com.rekoo.pubgm",
-		    "com.pubg.imobile",
+		    "com.pubg.imobile.test",
 		    "com.pubg.krmobile",
 		    "com.vng.pubgmobile",
 		};
